@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+   
+</head>
+<body>
+    <button onclick="GenerarFactura()">Genrar Factura</button>
+</body>
+
+</html>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>
+   
+<script>
+
+function GenerarFactura(){
+  
+
+
+
+    fetch('/Reporte1',
+        {method:'get'
+        })
+        .then(res=>res.json())
+        .then(datos=>{
+            const doc = new jsPDF();
+            
+            doc.rect(1,1, 208, 150); // empty square
+            doc.setFontSize(20);
+            doc.text(50,10,'Factura de Venta : 350');
+            doc.setFontSize(12);
+            doc.text(10,17,datos[0].Nombre);
+            doc.line(1,20,208, 20); // horizontal line
+            doc.text(5,28,'ID           Nombre            Cantidad         Valor/U        Total');
+             doc.line(1,30,208, 30); // horizontal line
+             var x=5;
+             var y=35;
+             var total=0;
+             doc.setFontSize(10);
+             for(var i=0;i<datos.length;i++){
+            var x=5;
+            doc.text(x,y,""+i);
+            var x=15;
+            doc.text(x,y,""+datos[i].Nombre_Pdto);
+            var x=70;
+            doc.text(x,y,""+datos[i].Cantidad);
+            var x=100;
+            doc.text(x,y,""+datos[i].Valor_Pdto);
+            
+            var x=130;
+            doc.text(x,y,""+datos[i].Total);
+            total=total+datos[i].Total;
+            y=y+5;
+            
+            }
+
+            doc.line(1,140,208, 140); // horizontal line
+            doc.setFontSize(20);
+            doc.text(1,148,"Total de la compra :           ");
+            doc.text(130,148,""+total);
+
+            doc.save("file.pdf");
+      
+/*
+            
+       
+
+            
+            
+            
+            
+            
+            
+        
+           
+
+*/
+
+
+        });
+ 
+
+
+
+}
+
+</script>

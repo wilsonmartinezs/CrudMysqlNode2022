@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+
+    <title>Ejemplo de registro de datos en Mysql con JavaScritp    </title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+     <link rel="stylesheet" type="text/css" href="/DataTables/datatables.css">
+ 
+</head>
+<body>
+
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+          <span class="navbar-brand mb-0 h1">REGISTRO DE USUARIOS</span>
+        </div>
+      </nav>
+
+<div class="container">
+  <button type="button" class="btn btn-primary m-2" onclick="Abrir();">Nuevo</button>
+ <div class="row">
+            <div class="col-12">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col">IDENTIFICACION</th>
+                          <th scope="col">NOMBRE</th>
+                          <th scope="col">DIRECCION</th>
+                          <th scope="col">TELEFONO</th>
+                          <th scope="col">ADMIN.</th>
+                        </tr>
+                      </thead>
+                      <tbody id='tabla'>
+                      </tbody >
+                    </table>
+            </div>
+
+
+            
+</div>
+
+
+
+
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Registrar usuarios</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="#" method="post">
+          <div class="mb-3">
+              <label  class="form-label">Identificacion</label>
+              <input type="text" id="Ident" class="form-control"  placeholder="Digite la identificación">
+          </div>
+
+          <div class="mb-3">
+              <label  class="form-label">Nombre</label>
+              <input type="text" id="Nomb" class="form-control"  placeholder="Digite el nombre">
+          </div>
+
+          <div class="mb-3">
+              <label  class="form-label">Direccion</label>
+              <input type="text" id="Dir" class="form-control" placeholder="Digite el nombre">
+          </div>
+
+          <div class="mb-3">
+              <label  class="form-label">Telefono</label>
+              <input type="text" id="Tel" class="form-control"  placeholder="Digite el nombre">
+          </div>
+
+
+            
+          </form>  
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn btn-primary" value="Registrar" onclick="Registrar_usuario()">
+        <input type="button" class="btn btn-primary" value="actualizar" onclick="Actualizar_usuario()">
+             
+     </div>
+    </div>
+  </div>
+</div>
+
+</body>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" charset="utf8" src="/DataTables/datatables.js"></script>
+
+
+
+
+
+</html>
+
+<script>
+  
+  var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+  Listar_Usuarios();
+function Abrir(){
+  myModal.show();
+}
+
+
+
+
+function Actualizar_usuario(){
+
+ 
+
+    var ident= document.getElementById('Ident').value;
+    var nomb= document.getElementById('Nomb').value;
+    var dir= document.getElementById('Dir').value;
+    var tel=document.getElementById('Tel').value;
+
+  var datos= new URLSearchParams();
+  datos.append('Identificacion',ident);
+  datos.append('Nombre',nomb);
+  datos.append('Direccion',dir);
+  datos.append('Telefono',tel);
+
+  
+
+
+
+
+
+fetch('/Actualizar_usuario',
+{method:'post',
+body: datos
+}
+).then(res=>res.json())
+.then(data=>{ 
+  myModal.hide();
+  Listar_Usuarios();  
+        Swal.fire({
+                  title: data.titulo,
+                  icon: data.icono,
+                  text:data.mensaje,
+                 
+                });          
+});
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+function Listar_Usuarios(){
+    
+        fetch('/Listar_Usuarios',
+        {method:'get'
+        })
+        .then(res=>res.json())
+        .then(data=>{
+          var html='';
+            for(var i=0; i<data.length;i++){
+              html += '<tr><td>'+data[i].pk_identificacion+'</td>';
+              html += '<td>'+data[i].Nombre+'</td>';
+              html += '<td>'+data[i].Direccion+'</td>';
+              html += '<td>'+data[i].Telefono+'</td>';
+              html += "<td><a href=javascript:Eliminar_Usuario("+data[i].pk_identificacion+
+                       ")>Elim.</a></td>";
+             html += "<td><a href=javascript:Buscar_Usuario("+data[i].pk_identificacion+
+                       ")>Act..</a></td>";
+              html += '<tr>';
+            }
+           document.getElementById('tabla').innerHTML=html;
+           
+        });
+    }
+
+
+    
+    function Buscar_Usuario(ident){
+
+      var datos= new URLSearchParams();
+        datos.append('Identificacion',ident);
+
+          fetch('/Buscar_Usuario',
+          {method:'post',
+          body: datos
+          })
+          .then(res=>res.json())
+          .then(data=>{
+
+            document.getElementById('Ident').value=data[0].pk_identificacion;
+            document.getElementById('Nomb').value=data[0].Nombre;
+            document.getElementById('Dir').value=data[0].Direccion;
+            document.getElementById('Tel').value=data[0].Telefono;
+
+            myModal.show();
+
+                   
+          });
+
+
+
+
+
+    }
+
+
+
+function Eliminar_Usuario(ident){
+
+        var datos= new URLSearchParams();
+        datos.append('Identificacion',ident);
+            fetch('/Eliminar_Usuario',
+          {method:'post',
+          body: datos
+          }
+          ).then(res=>res.json())
+          .then(data=>{
+                Listar_Usuarios();
+                  Swal.fire({
+                  title: data.titulo,
+                  icon: data.icono,
+                  text:data.mensaje,
+                  showConfirmButton: false,
+                  timer: 1500
+                });   
+          });
+
+
+
+}
+
+
+
+function Registrar_usuario(){
+    
+var id=document.getElementById('Ident').value;
+var nom=document.getElementById('Nomb').value;
+
+var datos= new URLSearchParams();
+datos.append('Identificacion',id);
+datos.append('Nombre',nom);
+
+
+const myHeader=  new Headers();
+myHeader.append('Authorization','Bearer '+localStorage.token);
+
+console.log(myHeader);
+
+fetch('/Registrar_Usuario',
+{method:'post',
+body: datos,
+headers:myHeader
+}
+).then(res=>res.json())
+.then(data=>{ 
+  myModal.hide();
+  Listar_Usuarios();  
+        
+  Swal.fire({
+                  title: data.titulo,
+                  icon: data.icono,
+                  text:data.mensaje,
+                  showConfirmButton: false,
+                  timer: 1500
+                });                
+});
+
+
+}
+
+</script>
